@@ -24,7 +24,7 @@ def nii_loader(path, dtype=np.float32, mmap_mode='r'):
 
 def read_table(path):
     """Read Excel table and return values"""
-    return pd.read_excel(path, header=None).values
+    return pd.read_excel(path, header=0).values
 
 
 def white0(image, threshold=0):
@@ -90,6 +90,12 @@ class IMG_Folder(torch.utils.data.Dataset):
             sid = str(f[0])
             slabel = int(f[1])
             smale = f[2]
+            if smale == 1:
+                smale = 0
+            elif smale == 2:
+                smale = 1
+            else:
+                raise ValueError(f"Unexpected SEX_ID value: {smale}")
             self.metadata[sid] = (slabel, smale)
 
         # Optionally preload all data into memory
@@ -113,6 +119,12 @@ class IMG_Folder(torch.utils.data.Dataset):
                 sid = str(f[0])
                 slabel = int(f[1])
                 smale = f[2]
+                if smale == 1:
+                    smale = 0
+                elif smale == 2:
+                    smale = 1
+                else:
+                    raise ValueError(f"Unexpected SEX_ID value: {smale}")
                 if sid == sub_fn:
                     break
         else:

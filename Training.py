@@ -11,13 +11,13 @@ from model import ScaleDense
 from model import CNN
 from model import ResNet
 from model import VGG
-from model.ranking_loss import rank_difference_loss
+# from model.ranking_loss import rank_difference_loss
 from load_data import IMG_Folder
-from prediction_first_stage import test
+from Prediction import test
 from sklearn.metrics import mean_absolute_error
 from model import GlobalLocalTransformer
 from model import vgg_4_trans
-from model.efficientnet_pytorch_3d import EfficientNet3D as EfNetB0
+# from model.efficientnet_pytorch_3d import EfficientNet3D as EfNetB0
 from model.vit import VisionTransformer
 from model.MultiViewViT import MultiViewViT
 from model.MultiViewResNet import MultiViewResNet
@@ -72,6 +72,12 @@ def main(res):
 
 
     # ===========  define data folder and CUDA device =========== #
+    # print('Train path:- ', opt.train_folder)
+    # print('Train files:- ', os.listdir(opt.train_folder))
+
+    # print('Val path:- ', opt.valid_folder)
+    # print('Val files:- ', os.listdir(opt.valid_folder))
+
     train_data = IMG_Folder( opt.excel_path
                             ,opt.train_folder)
     valid_data = IMG_Folder( opt.excel_path
@@ -149,12 +155,12 @@ def main(res):
     # =========== define the loss function =========== #
     loss_func_dict = {'mae': nn.L1Loss().to(device)
                      ,'mse': nn.MSELoss().to(device)
-                     ,'ranking':rank_difference_loss(sorter_checkpoint_path=opt.sorter
-                                                    ,beta=opt.beta).to(device)
+                    #  ,'ranking':rank_difference_loss(sorter_checkpoint_path=opt.sorter
+                    #                                 ,beta=opt.beta).to(device)
                      }
         
     criterion1 = loss_func_dict[opt.loss]
-    criterion2 = loss_func_dict[opt.aux_loss]
+    # criterion2 = loss_func_dict[opt.aux_loss]
 
     # =========== define optimizer and learning rate scheduler =========== #
     optimizer = torch.optim.Adam( model.parameters()
@@ -181,6 +187,7 @@ def main(res):
             
         # ===========  train for one epoch   =========== #
         train_loss, train_mae = train(  train_loader=train_loader
+                                
                                       , model=model
                                       , criterion1=criterion1
 
@@ -354,7 +361,7 @@ def train(train_loader, model, criterion1,  optimizer, device, epoch):
         loss.backward()
 
         optimizer.step()
-    with open("../training_loss/"+opt.model+" train_loss.txt", 'w') as train_los:
+    with open("training_loss/"+opt.model+" train_loss.txt", 'w') as train_los:
         train_los.write(str(train_loss))
 
     return losses.avg,MAE.avg
@@ -385,6 +392,7 @@ def validate(valid_loader, model, criterion1,  device):
         for _, (input,_,target,male) in enumerate(valid_loader):
             # input = input.type(torch.FloatTensor)
             input = input.to(device)
+            print('input shape:- ',input.shape)
 
             # =========== convert male lable to one hot type =========== #
             if opt.use_gender:
@@ -483,7 +491,7 @@ class EarlyStopping:
         self.counter = 0
         self.best_score = None
         self.early_stop = False
-        self.val_loss_min = np.Inf
+        self.val_loss_min = np.inf
 
     def __call__(self, val_metric):
 

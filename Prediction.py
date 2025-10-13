@@ -10,10 +10,10 @@ from model import ResNet
 from model import VGG
 from scipy.stats import pearsonr,spearmanr
 from sklearn.metrics import mean_absolute_error
-from load_mask_data import  IMG_Class_Folder
+from load_data import  IMG_Folder
 from model import GlobalLocalTransformer
 from model import vgg_4_trans
-from model.efficientnet_pytorch_3d import EfficientNet3D as EfNetB0
+# from model.efficientnet_pytorch_3d import EfficientNet3D as EfNetB0
 from model.vit import VisionTransformer
 from model.MultiViewViT import MultiViewViT
 from model.MultiViewResNet import MultiViewResNet
@@ -195,6 +195,8 @@ def test(valid_loader, model, criterion, device
 
         for _, (input, ids ,target,male) in enumerate(valid_loader):
             input = input.to(device).type(torch.FloatTensor)
+
+            print('input shape:- ',input.shape)
             
             # ======= convert male lable to one hot type ======= #
             male = torch.unsqueeze(male,1)
@@ -209,8 +211,9 @@ def test(valid_loader, model, criterion, device
                 output = model(input,male)
 
             else:
-                output = model(input)
-                #output, (attn1, attn2, attn3) = model(input, return_attention_weights=True)
+                # output = model(input, return_attention_weights=False)
+                output, (attn1, attn2, attn3) = model(input, return_attention_weights=True)
+            print(output)
             out.append(output.cpu().numpy())
             targ.append(target.cpu().numpy())
             ID.append(ids)
@@ -269,7 +272,7 @@ def test(valid_loader, model, criterion, device
         #Attn2 = torch.mean(torch.stack(Attn2), dim=0)
         #Attn3 = torch.mean(torch.stack(Attn3), dim=0)
 
-        original_data = nii_loader("../data/70s/sub-1004-nonlin_brain.nii.gz")
+        original_data = nii_loader("/home/omen/Documents/Megha/ABIDE1_PREPROCESSING_MULTIPROCESSED/non_linear_registered/Leuven_50683.nii.gz")
         #修改attention map方向时，修改下面的代码
         original_data = original_data[45, :, :]
 
@@ -319,7 +322,7 @@ def test(valid_loader, model, criterion, device
             plt.scatter(target_numpy,predicted_numpy)
             plt.xlabel('Chronological Age')
             plt.ylabel('predicted brain age')
-            plt.savefig('D:/TSAN-brain-age-estimation-master/画图/pre_vs_act.png')
+            plt.savefig('/home/omen/Documents/Rishabh/rp-ai-Triamese-ViT-v2/pre_vs_act.png')
             plt.show()
 
         return MAE,np.corrcoef(target_numpy,predicted_numpy)
