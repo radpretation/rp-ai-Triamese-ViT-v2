@@ -2,5 +2,9 @@ output_dirMulti_VIT_best_model_v1.pth.tar
 output_dirMulti_VIT_best_model.pth.tar
 output_dirMulti_VIT_checkpoint_v1.pth.tar
 output_dirMulti_VIT_checkpoint.pth.tar
+
+output_dirMulti_VIT__original_best_model.pth.tar
+output_dirMulti_VIT_best_model.pth.tar
+output_dirMulti_VIT_checkpoint.pth.tar
 __pycache__
 output_dir
